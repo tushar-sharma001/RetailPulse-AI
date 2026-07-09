@@ -15,7 +15,7 @@ st.set_page_config(
 def load_data():
 
     sales = pd.read_csv(
-        "data/Superstore.csv",
+        "data/train.csv",
         parse_dates=["Order Date", "Ship Date"],
         dayfirst=True
     )
