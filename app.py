@@ -171,6 +171,34 @@ def load_models():
 best_model, scaler, kmeans = load_models()
 
 # ----------------------------------------------------
+# Helper: validate the model comparison dataframe
+# ----------------------------------------------------
+# This is the key fix. `outputs/model_comparison.csv` is expected to hold
+# forecasting-model evaluation results with columns:
+#   Model, MAE, RMSE, MAPE
+# If that file instead contains something else (e.g. an anomaly-detection
+# method comparison with columns like "Method" / "Anomalies Detected"),
+# calling comparison["RMSE"].idxmin() raises a KeyError and crashes the app.
+# We validate up front and show a clear, non-fatal warning instead.
+
+REQUIRED_COMPARISON_COLUMNS = ["Model", "MAE", "RMSE", "MAPE"]
+
+
+def validate_comparison_df(df: pd.DataFrame) -> bool:
+    """Return True if df has the columns required for model comparison."""
+    return all(col in df.columns for col in REQUIRED_COMPARISON_COLUMNS)
+
+
+def get_best_model_row(df: pd.DataFrame):
+    """Safely return the row with the lowest RMSE, or None if unavailable."""
+    if not validate_comparison_df(df) or df.empty:
+        return None
+    return df.loc[df["RMSE"].idxmin()]
+
+
+comparison_is_valid = validate_comparison_df(comparison)
+
+# ----------------------------------------------------
 # Sidebar
 # ----------------------------------------------------
 
@@ -959,31 +987,27 @@ elif page == "Forecast Explorer":
 
     st.divider()
 
-    c1, c2, c3 = st.columns(3)
+    # Guard against a forecast horizon shorter than 3 rows too, not just
+    # the model_comparison issue - avoids a similar IndexError.
+    metric_cols = st.columns(3)
 
-    c1.metric(
+    for i, label in enumerate(["Month 1", "Month 2", "Month 3"]):
 
-        "Month 1",
+        with metric_cols[i]:
 
-        f"${forecast_df.iloc[0]['Forecast']:,.0f}"
+            if i < len(forecast_df):
 
-    )
+                st.metric(
 
-    c2.metric(
+                    label,
 
-        "Month 2",
+                    f"${forecast_df.iloc[i]['Forecast']:,.0f}"
 
-        f"${forecast_df.iloc[1]['Forecast']:,.0f}"
+                )
 
-    )
+            else:
 
-    c3.metric(
-
-        "Month 3",
-
-        f"${forecast_df.iloc[2]['Forecast']:,.0f}"
-
-    )
+                st.metric(label, "N/A")
 
     st.subheader("Forecast Results")
 
@@ -1009,31 +1033,51 @@ elif page == "Forecast Explorer":
 
     )
 
-    best_model = comparison.loc[
+    if comparison_is_valid:
 
-        comparison["RMSE"].idxmin()
+        best_row = get_best_model_row(comparison)
 
-    ]
-
-    st.info(
+        st.info(
 
 f"""
 
 ### Recommended Model
 
-**{best_model['Model']}**
+**{best_row['Model']}**
 
-MAE : {best_model['MAE']:.2f}
+MAE : {best_row['MAE']:.2f}
 
-RMSE : {best_model['RMSE']:.2f}
+RMSE : {best_row['RMSE']:.2f}
 
-MAPE : {best_model['MAPE']:.2f}%
+MAPE : {best_row['MAPE']:.2f}%
 
 This model achieved the lowest forecasting error and is recommended for production deployment.
 
 """
 
-    )
+        )
+
+    else:
+
+        st.warning(
+
+            "The file `outputs/model_comparison.csv` doesn't contain the "
+
+            f"expected forecasting-model columns {REQUIRED_COMPARISON_COLUMNS}. "
+
+            "It currently has: "
+
+            f"{list(comparison.columns)}. "
+
+            "This usually means the wrong file was saved to that path "
+
+            "(e.g. an anomaly-detection summary instead of the SARIMA/"
+
+            "Prophet/XGBoost comparison). Regenerate `outputs/model_comparison.csv` "
+
+            "from your forecasting evaluation step."
+
+        )
 
     st.download_button(
 
@@ -1549,30 +1593,64 @@ elif page == "Model Performance":
 
     st.divider()
 
-    best_model = comparison.loc[
-        comparison["RMSE"].idxmin()
-    ]
+    if not comparison_is_valid:
+
+        st.error(
+
+            "Cannot display model performance: `outputs/model_comparison.csv` "
+
+            f"is missing the required columns {REQUIRED_COMPARISON_COLUMNS}. "
+
+            "It currently has: "
+
+            f"{list(comparison.columns)}. "
+
+            "This file should contain forecasting-model evaluation results "
+
+            "(SARIMA / Prophet / XGBoost), not the anomaly-detection method "
+
+            "comparison. Please regenerate it from your model evaluation "
+
+            "script and re-deploy."
+
+        )
+
+        st.subheader("Current contents of model_comparison.csv")
+
+        st.dataframe(
+
+            comparison,
+
+            use_container_width=True,
+
+            hide_index=True
+
+        )
+
+        st.stop()
+
+    best_model_row = get_best_model_row(comparison)
 
     c1, c2, c3, c4 = st.columns(4)
 
     c1.metric(
         "Selected Model",
-        best_model["Model"]
+        best_model_row["Model"]
     )
 
     c2.metric(
         "MAE",
-        f"{best_model['MAE']:.2f}"
+        f"{best_model_row['MAE']:.2f}"
     )
 
     c3.metric(
         "RMSE",
-        f"{best_model['RMSE']:.2f}"
+        f"{best_model_row['RMSE']:.2f}"
     )
 
     c4.metric(
         "MAPE",
-        f"{best_model['MAPE']:.2f}%"
+        f"{best_model_row['MAPE']:.2f}%"
     )
 
     st.divider()
@@ -1729,7 +1807,7 @@ f"""
 
 ### Recommended Production Model
 
-**{best_model['Model']}**
+**{best_model_row['Model']}**
 
 This model achieved the lowest prediction error across the evaluation metrics.
 
@@ -1789,7 +1867,3 @@ st.divider()
 st.caption(
     "RetailPulse AI • AI-Powered Sales Forecasting & Demand Intelligence • Built with Python, Streamlit, XGBoost, Prophet, SARIMA and Plotly"
 )
-
-
-
-
