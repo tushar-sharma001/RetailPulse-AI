@@ -165,7 +165,10 @@ if page == "🏠 Dashboard":
 
     total_sales = filtered_sales["Sales"].sum()
 
+    if "Profit" in filtered_sales.columns:
     total_profit = filtered_sales["Profit"].sum()
+    else:
+    total_profit = 0
 
     total_orders = filtered_sales["Order ID"].nunique()
 
@@ -216,8 +219,8 @@ if page == "🏠 Dashboard":
     )
 
     c2.metric(
-        "💵 Total Profit",
-        f"${total_profit:,.0f}"
+    "💰 Sales",
+    f"${total_sales:,.0f}"
     )
 
     c3.metric(
