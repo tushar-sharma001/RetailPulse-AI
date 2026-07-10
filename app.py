@@ -187,14 +187,6 @@ with st.sidebar:
 
     st.divider()
 
-    st.markdown("# RetailPulse AI")
-
-    st.caption(
-        "Sales Forecasting & Demand Intelligence"
-    )
-
-    st.divider()
-
     page = st.radio(
 
         "Navigation",
