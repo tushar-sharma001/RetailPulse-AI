@@ -137,41 +137,25 @@ screenshots/dashboard.png
 
 ## Forecast Explorer
 
-> Add a screenshot here
-
-```
 screenshots/forecast.png
-```
 
 ---
 
 ## Anomaly Detection
 
-> Add a screenshot here
-
-```
 screenshots/anomaly.png
-```
 
 ---
 
 ## Demand Segmentation
 
-> Add a screenshot here
-
-```
 screenshots/segmentation.png
-```
 
 ---
 
 ## Model Performance
 
-> Add a screenshot here
-
-```
 screenshots/model_performance.png
-```
 
 ---
 
