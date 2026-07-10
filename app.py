@@ -150,7 +150,7 @@ def load_data():
 # Load ML Models
 # ----------------------------------------------------
 
-@st.cache_resource
+'''@st.cache_resource
 def load_models():
 
     best_model = joblib.load(
@@ -168,7 +168,7 @@ def load_models():
     return best_model, scaler, kmeans
 
 
-best_model, scaler, kmeans = load_models()
+best_model, scaler, kmeans = load_models()'''
 
 # ----------------------------------------------------
 # Helper: validate the model comparison dataframe
