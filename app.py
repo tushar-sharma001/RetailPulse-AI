@@ -14,12 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Sidebar / header logo
-st.logo(
-    "assets/logo.png",
-    icon_image="assets/logo_icon.png",
-    size="large"
-)
+
 
 # ----------------------------------------------------
 # Custom Styling
@@ -184,6 +179,13 @@ comparison_is_valid = validate_comparison_df(comparison)
 # ----------------------------------------------------
 
 with st.sidebar:
+
+    st.image(
+    "assets/logo.png",
+    width=220
+    )
+
+    st.divider()
 
     st.markdown("# RetailPulse AI")
 
