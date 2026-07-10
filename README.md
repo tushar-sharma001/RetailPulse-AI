@@ -1,95 +1,112 @@
+<div align="center">
+
+<img src="assets/logo.png" width="220">
+
 # 📈 RetailPulse AI
 
 ### AI-Powered Sales Forecasting & Demand Intelligence Platform
 
-RetailPulse AI is an end-to-end retail analytics platform that combines machine learning, time series forecasting, anomaly detection, and demand segmentation to help businesses make smarter inventory and sales planning decisions.
+An end-to-end machine learning solution that forecasts retail sales, detects anomalies, segments products based on demand patterns, and delivers actionable business insights through an interactive Streamlit dashboard.
 
-Built using Python, Streamlit, XGBoost, Prophet, SARIMA, and Scikit-learn, the project provides an interactive dashboard for forecasting demand, detecting unusual sales patterns, and analyzing product performance.
+![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)
+![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-red?logo=streamlit)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-orange?logo=scikitlearn)
+![XGBoost](https://img.shields.io/badge/XGBoost-Forecasting-success)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+</div>
 
 ---
 
-## 📌 Problem Statement
+# 📌 Overview
 
-Retail and e-commerce businesses often struggle to answer one critical question:
+RetailPulse AI is a business intelligence platform designed to help retailers forecast future sales, identify unusual demand behaviour, segment products using machine learning, and support inventory planning through an intuitive analytics dashboard.
 
-> **How much inventory should we stock over the next few months?**
+The application combines statistical forecasting, machine learning, anomaly detection, clustering, and interactive visualization into a single decision-support system.
 
-Incorrect demand estimation can result in:
+---
+
+# 🎯 Business Problem
+
+Retail businesses often face uncertainty while planning inventory for upcoming months.
+
+Poor demand estimation can lead to:
 
 - Overstocking and increased inventory costs
-- Stock shortages and lost revenue
-- Inefficient supply chain planning
-- Poor customer experience
+- Product shortages and lost sales
+- Inefficient warehouse utilization
+- Poor customer satisfaction
+- Revenue loss due to inaccurate forecasting
 
-RetailPulse AI addresses these challenges by providing accurate demand forecasts, anomaly detection, and product demand segmentation through an interactive analytics dashboard.
+RetailPulse AI addresses these challenges using data-driven forecasting and demand intelligence.
 
 ---
 
 # 🚀 Features
 
-### 📊 Executive Dashboard
+## 📊 Executive Dashboard
 
 - Business KPI cards
-- Monthly sales trend
-- Revenue by region
-- Revenue by category
-- Top-selling products
+- Sales trend analysis
+- Region-wise revenue
+- Category-wise revenue
+- Top-performing products
 - Interactive filters
 
 ---
 
-### 📈 Sales Forecasting
+## 📈 Sales Forecasting
 
-Implemented and compared three forecasting models:
+Three forecasting approaches were implemented and compared.
 
 - SARIMA
-- Facebook Prophet
+- Prophet
 - XGBoost Regressor
 
-Forecast evaluation using:
+Evaluation metrics:
 
 - MAE
 - RMSE
 - MAPE
 
-Generate forecasts for the next three months.
+Supports three-month sales forecasting.
 
 ---
 
-### 🚨 Anomaly Detection
+## 🚨 Anomaly Detection
 
-Detect unusual sales spikes and drops using:
+Detect unusual sales spikes and drops using
 
 - Isolation Forest
 - Z-Score Analysis
 
-Visualize anomalies on weekly sales trends.
+Interactive anomaly visualization over weekly sales.
 
 ---
 
-### 📦 Product Demand Segmentation
+## 📦 Demand Segmentation
 
-Segment products using K-Means Clustering based on:
+Products are clustered using K-Means based on
 
 - Sales Volume
 - Growth Rate
 - Sales Volatility
 - Average Order Value
 
-Visualize demand clusters using PCA.
+PCA is used for cluster visualization.
 
 ---
 
-### 🤖 Model Performance
+## ⚙️ Model Performance
 
-Compare forecasting models and automatically recommend the best-performing model for production deployment.
+Compare forecasting models and automatically recommend the best-performing model for deployment.
 
 ---
 
-# 🛠️ Tech Stack
+# 🛠 Technology Stack
 
-| Category | Tools |
-|-----------|-------|
+| Category | Technologies |
+|-----------|--------------|
 | Programming | Python |
 | Dashboard | Streamlit |
 | Data Processing | Pandas, NumPy |
@@ -109,63 +126,102 @@ RetailPulse-AI/
 ├── app.py
 ├── requirements.txt
 ├── README.md
-├── summary.pdf
 ├── .gitignore
 │
 ├── assets/
+│   ├── logo.png
+│   └── logo_icon.png
+│
 ├── data/
+│   └── train.csv
+│
 ├── models/
+│
 ├── notebooks/
+│   └── RetailPulseAI.ipynb
+│
 ├── outputs/
+│   ├── future_forecast.csv
+│   ├── segment_forecasts.csv
+│   ├── product_clusters.csv
+│   ├── weekly_anomalies.csv
+│   └── model_comparison.csv
+│
 ├── reports/
+│   ├── summary.pdf
+│   └── summary.docx
+│
 └── screenshots/
+    ├── home.png
+    ├── dashboard.png
+    ├── forecast.png
+    ├── anomaly.png
+    ├── segmentation.png
+    └── model_performance.png
 ```
 
 ---
 
-# 📈 Dashboard Preview
+# 📷 Dashboard Preview
 
-## Executive Dashboard
+## 🏠 Home
 
-> Add a screenshot here
-
-```
-screenshots/dashboard.png
-```
+<p align="center">
+<img src="screenshots/home.png" width="900">
+</p>
 
 ---
 
-## Forecast Explorer
+## 📊 Executive Dashboard
 
-screenshots/forecast.png
-
----
-
-## Anomaly Detection
-
-screenshots/anomaly.png
+<p align="center">
+<img src="screenshots/dashboard.png" width="900">
+</p>
 
 ---
 
-## Demand Segmentation
+## 📈 Forecast Explorer
 
-screenshots/segmentation.png
-
----
-
-## Model Performance
-
-screenshots/model_performance.png
+<p align="center">
+<img src="screenshots/forecast.png" width="900">
+</p>
 
 ---
 
-# 📊 Machine Learning Pipeline
+## 🚨 Anomaly Detection
+
+<p align="center">
+<img src="screenshots/anomaly.png" width="900">
+</p>
+
+---
+
+## 📦 Demand Segmentation
+
+<p align="center">
+<img src="screenshots/segmentation.png" width="900">
+</p>
+
+---
+
+## ⚙️ Model Performance
+
+<p align="center">
+<img src="screenshots/model_performance.png" width="900">
+</p>
+
+---
+
+# ⚙ Machine Learning Pipeline
 
 ```text
 Retail Sales Dataset
           │
           ▼
-Data Cleaning & Feature Engineering
+Data Cleaning
+          │
+          ▼
+Feature Engineering
           │
           ▼
 Exploratory Data Analysis
@@ -174,10 +230,10 @@ Exploratory Data Analysis
 Time Series Analysis
           │
           ▼
-Forecasting Models
- ├── SARIMA
- ├── Prophet
- └── XGBoost
+Forecasting
+├── SARIMA
+├── Prophet
+└── XGBoost
           │
           ▼
 Model Evaluation
@@ -189,55 +245,71 @@ Anomaly Detection
 Demand Segmentation
           │
           ▼
-Interactive Streamlit Dashboard
+Interactive Dashboard
 ```
 
 ---
 
-# 📌 Key Business Insights
+# 📊 Key Business Insights
 
-- Technology is the highest revenue-generating category.
-- West region demonstrates consistent sales performance.
-- November and December show recurring seasonal demand peaks.
-- XGBoost achieved the lowest forecasting error among the evaluated models.
-- Isolation Forest effectively identified abnormal sales spikes.
-- Product segmentation supports inventory optimization and demand planning.
+- Technology products generated the highest overall revenue.
+- The West region consistently outperformed other regions.
+- Seasonal demand peaks were observed during November and December.
+- XGBoost achieved the lowest forecasting error across evaluated models.
+- Isolation Forest effectively identified unusual sales behaviour.
+- Demand segmentation supports more efficient inventory allocation.
 
 ---
 
-# 📈 Model Comparison
+# 📈 Forecast Model Comparison
 
 | Model | MAE | RMSE | MAPE |
 |------|------:|------:|------:|
-| SARIMA | 13455.42 | 15938.99 | 22.02% |
-| Prophet | 10128.56 | 14561.39 | 14.33% |
+| SARIMA | 13,455.42 | 15,938.99 | 22.02% |
+| Prophet | 10,128.56 | 14,561.39 | 14.33% |
 | XGBoost | **Best** | **Best** | **Best** |
 
-> XGBoost was selected as the production model based on its superior forecasting performance.
+> XGBoost was selected as the preferred production model based on forecasting accuracy.
+
+---
+
+# 📄 Dataset
+
+The project uses the Sample Superstore Sales dataset containing
+
+- Orders
+- Customers
+- Products
+- Categories
+- Regions
+- Shipping Information
+- Sales
+- Profit
+- Discount
 
 ---
 
 # ⚡ Installation
 
-Clone the repository.
+Clone the repository
 
 ```bash
 git clone https://github.com/tushar-sharma001/RetailPulse-AI.git
 ```
 
-Move into the project directory.
+Navigate to the project
 
 ```bash
 cd RetailPulse-AI
 ```
 
-Install dependencies.
+Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the Streamlit application.
+Launch the application
 
 ```bash
 streamlit run app.py
@@ -245,38 +317,29 @@ streamlit run app.py
 
 ---
 
-# 📄 Dataset
-
-This project uses the **Sample Superstore Sales Dataset**, which contains retail transaction data including:
-
-- Orders
-- Products
-- Categories
-- Regions
-- Customers
-- Sales
-- Profit
-- Shipping information
-
----
-
 # 🎯 Future Improvements
 
-- LSTM and Transformer-based forecasting
-- Real-time dashboard with live sales feeds
+- LSTM-based forecasting
+- Transformer forecasting models
 - Inventory optimization engine
-- Automated alert system for anomalies
-- Cloud deployment using Docker and Azure/AWS
-- Role-based authentication
+- Real-time sales streaming
+- Automated anomaly alerts
+- Docker deployment
+- Azure / AWS deployment
+- User authentication
 
 ---
 
 # 👨‍💻 Author
 
-**Tushar Sharma**
+## Tushar Sharma
 
-AI & Machine Learning | Data Science | Generative AI
+AI & Machine Learning • Data Science • Generative AI
 
 ---
 
-## ⭐ If you found this project useful, consider giving it a star!
+<div align="center">
+
+### ⭐ If you found this project useful, consider giving it a Star!
+
+</div>
