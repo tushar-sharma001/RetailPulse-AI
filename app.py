@@ -16,6 +16,7 @@ st.set_page_config(
 
 #sidebar / header logo
 st.logo(
+    "assets/logo_icon.png",
     icon_image="assets/logo_icon.png",
     size="large"
 )
