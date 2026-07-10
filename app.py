@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import joblib
 
 # ----------------------------------------------------
 # Page Configuration
@@ -10,9 +9,16 @@ import joblib
 
 st.set_page_config(
     page_title="RetailPulse AI",
-    page_icon="📊",
+    page_icon="assets/logo_icon.png",
     layout="wide",
     initial_sidebar_state="expanded"
+)
+
+# Sidebar / header logo
+st.logo(
+    "assets/logo.png",
+    icon_image="assets/logo_icon.png",
+    size="large"
 )
 
 # ----------------------------------------------------
@@ -147,35 +153,10 @@ def load_data():
 ) = load_data()
 
 # ----------------------------------------------------
-# Load ML Models
-# ----------------------------------------------------
-
-'''@st.cache_resource
-def load_models():
-
-    best_model = joblib.load(
-        "models/best_xgboost.pkl"
-    )
-
-    scaler = joblib.load(
-        "models/scaler.pkl"
-    )
-
-    kmeans = joblib.load(
-        "models/kmeans.pkl"
-    )
-
-    return best_model, scaler, kmeans
-
-
-best_model, scaler, kmeans = load_models()'''
-
-# ----------------------------------------------------
 # Helper: validate the model comparison dataframe
 # ----------------------------------------------------
-# This is the key fix. `outputs/model_comparison.csv` is expected to hold
-# forecasting-model evaluation results with columns:
-#   Model, MAE, RMSE, MAPE
+# `outputs/model_comparison.csv` is expected to hold forecasting-model
+# evaluation results with columns: Model, MAE, RMSE, MAPE
 # If that file instead contains something else (e.g. an anomaly-detection
 # method comparison with columns like "Method" / "Anomalies Detected"),
 # calling comparison["RMSE"].idxmin() raises a KeyError and crashes the app.
