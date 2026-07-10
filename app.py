@@ -21,8 +21,19 @@ def load_data():
     )
 
     forecast = pd.read_csv(
-        "outputs/future_forecast.csv",
-        parse_dates=["Date"]
+    "outputs/future_forecast.csv"
+    )
+
+    forecast["Forecast Month"] = pd.to_datetime(
+    forecast["Forecast Month"]
+    )
+
+    forecast.rename(
+    columns={
+        "Forecast Month": "Date",
+        "Predicted Sales": "Forecast"
+    },
+    inplace=True
     )
 
     segment_forecasts = pd.read_csv(
