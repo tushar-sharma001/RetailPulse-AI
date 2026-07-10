@@ -14,13 +14,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-#sidebar / header logo
-st.logo(
-    "assets/logo_icon.png",
-    icon_image="assets/logo_icon.png",
-    size="large"
-)
-
 # ----------------------------------------------------
 # Custom Styling
 # ----------------------------------------------------
