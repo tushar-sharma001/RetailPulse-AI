@@ -4,41 +4,114 @@ import plotly.express as px
 import plotly.graph_objects as go
 import joblib
 
+# ----------------------------------------------------
+# Page Configuration
+# ----------------------------------------------------
+
 st.set_page_config(
     page_title="RetailPulse AI",
-    page_icon="📈",
+    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# ----------------------------------------------------
+# Custom Styling
+# ----------------------------------------------------
+
+st.markdown("""
+<style>
+
+/* Main app */
+.main{
+    background-color:#F8FAFC;
+}
+
+/* Remove Streamlit padding */
+.block-container{
+    padding-top:2rem;
+    padding-bottom:2rem;
+    padding-left:2rem;
+    padding-right:2rem;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"]{
+    background:#FFFFFF;
+    border-right:1px solid #E5E7EB;
+}
+
+/* Headers */
+h1{
+    color:#0F172A;
+    font-weight:700;
+}
+
+h2{
+    color:#1E293B;
+}
+
+h3{
+    color:#334155;
+}
+
+/* Metric Cards */
+div[data-testid="metric-container"]{
+    background:white;
+    border:1px solid #E2E8F0;
+    padding:18px;
+    border-radius:14px;
+    box-shadow:0 1px 6px rgba(0,0,0,.05);
+}
+
+/* Dataframes */
+div[data-testid="stDataFrame"]{
+    border-radius:12px;
+}
+
+/* Buttons */
+.stButton>button{
+    border-radius:8px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ----------------------------------------------------
+# Load Data
+# ----------------------------------------------------
 
 @st.cache_data
 def load_data():
 
     sales = pd.read_csv(
         "data/train.csv",
-        parse_dates=["Order Date", "Ship Date"],
+        parse_dates=[
+            "Order Date",
+            "Ship Date"
+        ],
         dayfirst=True
     )
 
     forecast = pd.read_csv(
-    "outputs/future_forecast.csv"
+        "outputs/future_forecast.csv"
     )
 
     forecast["Forecast Month"] = pd.to_datetime(
-    forecast["Forecast Month"]
+        forecast["Forecast Month"]
     )
 
     forecast.rename(
-    columns={
-        "Forecast Month": "Date",
-        "Predicted Sales": "Forecast"
-    },
-    inplace=True
+        columns={
+            "Forecast Month":"Date",
+            "Predicted Sales":"Forecast"
+        },
+        inplace=True
     )
 
     segment_forecasts = pd.read_csv(
-    "outputs/segment_forecasts.csv",
-    parse_dates=["Date"]
+        "outputs/segment_forecasts.csv",
+        parse_dates=["Date"]
     )
 
     anomalies = pd.read_csv(
@@ -64,7 +137,18 @@ def load_data():
     )
 
 
-sales, forecast, segment_forecasts, anomalies, clusters, comparison = load_data()
+(
+    sales,
+    forecast,
+    segment_forecasts,
+    anomalies,
+    clusters,
+    comparison
+) = load_data()
+
+# ----------------------------------------------------
+# Load ML Models
+# ----------------------------------------------------
 
 @st.cache_resource
 def load_models():
@@ -86,9 +170,13 @@ def load_models():
 
 best_model, scaler, kmeans = load_models()
 
+# ----------------------------------------------------
+# Sidebar
+# ----------------------------------------------------
+
 with st.sidebar:
 
-    st.title("📈 RetailPulse AI")
+    st.markdown("# RetailPulse AI")
 
     st.caption(
         "Sales Forecasting & Demand Intelligence"
@@ -97,528 +185,881 @@ with st.sidebar:
     st.divider()
 
     page = st.radio(
+
         "Navigation",
+
         [
-            "🏠 Dashboard",
-            "📈 Forecast Explorer",
-            "🚨 Anomaly Report",
-            "📦 Demand Segments",
-            "🤖 Model Performance"
+
+            "Home",
+
+            "Executive Dashboard",
+
+            "Forecast Explorer",
+
+            "Anomaly Detection",
+
+            "Demand Segmentation",
+
+            "Model Performance"
+
         ]
+
+    )
+
+    st.divider()
+
+    st.markdown(
+        """
+**Dataset**
+
+• 9,994 Orders
+
+• 3 Categories
+
+• 4 Regions
+
+• 2014–2017
+"""
     )
 
     st.divider()
 
     st.caption("Version 1.0")
-    # ==========================================================
-# Dashboard
-# ==========================================================
 
-if page == "🏠 Dashboard":
 
-    # ---------------- Hero Section ---------------- #
+# ----------------------------------------------------
+# Home
+# ----------------------------------------------------
 
-    st.title("📈 RetailPulse AI")
+if page == "Home":
+
+    st.title("RetailPulse AI")
 
     st.markdown(
         """
-        ### AI-Powered Sales Forecasting & Demand Intelligence Platform
+### AI-Powered Sales Forecasting & Demand Intelligence Platform
 
-        Monitor retail sales, forecast future demand, detect anomalies, and
-        analyze product performance through an interactive dashboard.
-        """
+RetailPulse AI is an end-to-end analytics solution that helps businesses forecast sales,
+identify unusual demand patterns, segment products based on purchasing behaviour,
+and support inventory planning using machine learning.
+"""
     )
 
     st.divider()
 
-    # ---------------- Apply Filters ---------------- #
+    c1,c2,c3,c4 = st.columns(4)
+
+    c1.metric(
+        "Orders",
+        f"{sales['Order ID'].nunique():,}"
+    )
+
+    c2.metric(
+        "Customers",
+        f"{sales['Customer ID'].nunique():,}"
+    )
+
+    c3.metric(
+        "Products",
+        f"{sales['Product ID'].nunique():,}"
+    )
+
+    c4.metric(
+        "Total Sales",
+        f"${sales['Sales'].sum():,.0f}"
+    )
+
+    st.divider()
+
+    left,right = st.columns([2,1])
+
+    with left:
+
+        st.subheader("Platform Capabilities")
+
+        st.markdown("""
+
+- Sales Trend Analysis
+
+- Time Series Forecasting
+
+- Demand Forecasting
+
+- Anomaly Detection
+
+- Product Demand Segmentation
+
+- Executive Business Dashboard
+
+- Interactive Visual Analytics
+
+        """)
+
+    with right:
+
+        st.subheader("Technology Stack")
+
+        st.markdown("""
+
+        Python
+        
+        Streamlit
+        
+        Pandas
+        
+        Plotly
+        
+        XGBoost
+        
+        Prophet
+        
+        SARIMA
+        
+        Scikit-learn
+
+        """)
+
+# ----------------------------------------------------
+# Executive Dashboard
+# ----------------------------------------------------
+
+elif page == "Executive Dashboard":
+
+    st.title("Executive Dashboard")
+
+    st.caption(
+        "Monitor sales performance, customer activity and demand trends."
+    )
+
+    st.divider()
+
+
+    # -----------------------------
+    # Filters
+    # -----------------------------
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        selected_region = st.selectbox(
+
+            "Region",
+
+            ["All"] +
+            sorted(sales["Region"].unique())
+
+        )
+
+    with col2:
+
+        selected_category = st.selectbox(
+
+            "Category",
+
+            ["All"] +
+            sorted(sales["Category"].unique())
+
+        )
 
     filtered_sales = sales.copy()
 
-    filter1, filter2 = st.columns(2)
-
-    with filter1:
-
-        selected_region = st.selectbox(
-            "Region",
-            ["All"] + sorted(sales["Region"].unique())
-        )
-
-    with filter2:
-
-        selected_category = st.selectbox(
-            "Category",
-            ["All"] + sorted(sales["Category"].unique())
-        )
-
     if selected_region != "All":
+
         filtered_sales = filtered_sales[
             filtered_sales["Region"] == selected_region
         ]
 
     if selected_category != "All":
+
         filtered_sales = filtered_sales[
             filtered_sales["Category"] == selected_category
         ]
 
-    # ---------------- KPI Calculations ---------------- #
+
+    # -----------------------------
+    # KPI Calculations
+    # -----------------------------
 
     total_sales = filtered_sales["Sales"].sum()
-
-    if "Profit" in filtered_sales.columns:
-    total_profit = filtered_sales["Profit"].sum()
-    else:
-    total_profit = 0
 
     total_orders = filtered_sales["Order ID"].nunique()
 
     total_customers = filtered_sales["Customer ID"].nunique()
 
+    total_products = filtered_sales["Product ID"].nunique()
+
     average_order = filtered_sales["Sales"].mean()
 
     average_shipping = (
-        (
-            filtered_sales["Ship Date"]
-            - filtered_sales["Order Date"]
-        )
-        .dt.days
-        .mean()
-    )
+
+        filtered_sales["Ship Date"]
+
+        -
+
+        filtered_sales["Order Date"]
+
+    ).dt.days.mean()
 
     yearly_sales = (
+
         filtered_sales
-        .groupby(filtered_sales["Order Date"].dt.year)["Sales"]
+
+        .groupby(
+
+            filtered_sales["Order Date"].dt.year
+
+        )["Sales"]
+
         .sum()
+
     )
 
     if len(yearly_sales) >= 2:
 
-        sales_growth = (
-            (
-                yearly_sales.iloc[-1]
-                - yearly_sales.iloc[-2]
-            )
-            / yearly_sales.iloc[-2]
-        ) * 100
+        growth = (
+
+            yearly_sales.iloc[-1]
+
+            -
+
+            yearly_sales.iloc[-2]
+
+        ) / yearly_sales.iloc[-2] * 100
 
     else:
 
-        sales_growth = 0
+        growth = 0
 
-    # ---------------- KPI Cards ---------------- #
 
-    st.subheader("Business Overview")
+    # -----------------------------
+    # KPI Cards
+    # -----------------------------
 
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2, c3 = st.columns(3)
 
-    c5, c6, c7 = st.columns(3)
+    c4, c5, c6 = st.columns(3)
 
     c1.metric(
-        "💰 Total Sales",
+
+        "Total Sales",
+
         f"${total_sales:,.0f}"
+
     )
 
     c2.metric(
-    "💰 Sales",
-    f"${total_sales:,.0f}"
+
+        "Orders",
+
+        f"{total_orders:,}"
+
     )
 
     c3.metric(
-        "🛒 Orders",
-        total_orders
+
+        "Customers",
+
+        f"{total_customers:,}"
+
     )
 
     c4.metric(
-        "👥 Customers",
-        total_customers
+
+        "Products",
+
+        f"{total_products:,}"
+
     )
 
     c5.metric(
-        "📦 Avg Order Value",
+
+        "Average Order Value",
+
         f"${average_order:.2f}"
+
     )
 
     c6.metric(
-        "🚚 Avg Shipping Time",
-        f"{average_shipping:.1f} Days"
-    )
 
-    c7.metric(
-        "📈 Sales Growth",
-        f"{sales_growth:.2f}%"
+        "Sales Growth",
+
+        f"{growth:.2f}%"
+
     )
 
     st.divider()
 
-    # ---------------- Monthly Trend ---------------- #
+    # -----------------------------
+    # Monthly Sales Trend
+    # -----------------------------
 
     monthly_sales = (
+
         filtered_sales
+
         .groupby(
+
             pd.Grouper(
+
                 key="Order Date",
+
                 freq="ME"
+
             )
+
         )["Sales"]
+
         .sum()
+
         .reset_index()
+
     )
 
     fig = px.line(
+
         monthly_sales,
+
         x="Order Date",
+
         y="Sales",
+
         markers=True,
+
         title="Monthly Sales Trend"
+
     )
 
     fig.update_layout(
+
         template="plotly_white",
-        title_x=0.5
+
+        title_x=0.5,
+
+        height=450
+
     )
 
     st.plotly_chart(
-        fig,
-        use_container_width=True
-    )
 
-    # ---------------- Region & Category ---------------- #
+        fig,
+
+        use_container_width=True
+
+    )
 
     left, right = st.columns(2)
 
     with left:
 
         region_sales = (
+
             filtered_sales
+
             .groupby("Region")["Sales"]
+
             .sum()
+
             .reset_index()
+
         )
 
         fig = px.bar(
+
             region_sales,
+
             x="Region",
+
             y="Sales",
+
             color="Region",
-            title="Revenue by Region"
+
+            title="Sales by Region"
+
         )
 
         fig.update_layout(
+
             template="plotly_white",
+
             showlegend=False
+
         )
 
         st.plotly_chart(
+
             fig,
+
             use_container_width=True
+
         )
 
     with right:
 
         category_sales = (
+
             filtered_sales
+
             .groupby("Category")["Sales"]
+
             .sum()
+
             .reset_index()
+
         )
 
         fig = px.pie(
+
             category_sales,
-            values="Sales",
+
             names="Category",
+
+            values="Sales",
+
             hole=0.45,
-            title="Revenue by Category"
+
+            title="Sales by Category"
+
         )
 
         st.plotly_chart(
+
             fig,
+
             use_container_width=True
+
         )
 
-    # ---------------- Top Products ---------------- #
-
-    st.subheader("Top Selling Products")
+    st.subheader("Top Performing Products")
 
     top_products = (
+
         filtered_sales
+
         .groupby("Product Name")["Sales"]
+
         .sum()
-        .sort_values(ascending=False)
+
+        .sort_values(
+
+            ascending=False
+
+        )
+
         .head(10)
+
         .reset_index()
+
     )
 
     fig = px.bar(
+
         top_products,
+
         x="Sales",
+
         y="Product Name",
+
         orientation="h",
-        color="Sales",
-        title="Top 10 Products by Revenue"
+
+        color="Sales"
+
     )
 
     fig.update_layout(
+
         template="plotly_white",
+
         yaxis=dict(
+
             categoryorder="total ascending"
-        )
+
+        ),
+
+        height=500
+
     )
 
     st.plotly_chart(
+
         fig,
+
         use_container_width=True
+
     )
 
-    # ---------------- Summary ---------------- #
-
-    st.subheader("Business Summary")
+    st.subheader("Executive Insights")
 
     best_region = (
+
         filtered_sales
+
         .groupby("Region")["Sales"]
+
         .sum()
+
         .idxmax()
+
     )
 
     best_category = (
+
         filtered_sales
+
         .groupby("Category")["Sales"]
+
         .sum()
+
         .idxmax()
+
     )
 
-    st.success(
-        f"""
-        **Highlights**
-        • Highest Revenue Region: **{best_region}**
-        • Best Performing Category: **{best_category}**
-        • Total Revenue: **${total_sales:,.0f}**
-        • Sales Growth: **{sales_growth:.2f}%**
-        • Average Shipping Time: **{average_shipping:.1f} Days**
-        """
+    shipping_days = round(
+
+        average_shipping,
+
+        1
+
     )
-    # ==========================================================
-    # Forecast Explorer
-    # =========================================================
 
-elif page == "📈 Forecast Explorer":
+    st.info(
 
-    st.title("📈 Forecast Explorer")
+f"""
 
-    st.markdown(
-        """
-        Explore future sales forecasts and review the performance of the
-        forecasting model used in this project.
-        """
+### Business Summary
+
+**Top Region**
+
+{best_region}
+
+**Top Category**
+
+{best_category}
+
+**Average Shipping Time**
+
+{shipping_days} Days
+
+**Recommendation**
+
+Increase inventory allocation for high-performing categories while maintaining additional stock ahead of seasonal demand periods.
+
+"""
+
+    )
+
+
+# ----------------------------------------------------
+# Forecast Explorer
+# ----------------------------------------------------
+
+elif page == "Forecast Explorer":
+
+    st.title("Forecast Explorer")
+
+    st.caption(
+        "Analyze future sales forecasts and compare model performance."
     )
 
     st.divider()
 
-    # ---------------- Forecast Options ---------------- #
+    # -----------------------------
+    # Forecast Controls
+    # -----------------------------
 
     left, right = st.columns(2)
 
     with left:
 
         forecast_type = st.selectbox(
-            "Forecast Type",
+
+            "Forecast Level",
+
             [
+
                 "Overall Sales",
+
                 "Category",
+
                 "Region"
+
             ]
+
         )
 
     with right:
 
         horizon = st.slider(
-            "Forecast Horizon (Months)",
+
+            "Forecast Horizon",
+
             min_value=1,
+
             max_value=3,
+
             value=3
+
         )
 
-    st.divider()
-
-    # ---------------- Overall Forecast ---------------- #
+    # -----------------------------
+    # Overall Forecast
+    # -----------------------------
 
     if forecast_type == "Overall Sales":
 
-        display_forecast = forecast.head(horizon)
+        forecast_df = forecast.head(horizon)
 
-        fig = go.Figure()
+        fig = px.line(
 
-        fig.add_trace(
-            go.Scatter(
-                x=display_forecast["Date"],
-                y=display_forecast["Forecast"],
-                mode="lines+markers",
-                name="Forecast"
-            )
+            forecast_df,
+
+            x="Date",
+
+            y="Forecast",
+
+            markers=True,
+
+            title="Sales Forecast"
+
         )
 
         fig.update_layout(
+
             template="plotly_white",
-            title="Overall Sales Forecast",
+
             title_x=0.5,
-            xaxis_title="Month",
-            yaxis_title="Predicted Sales"
+
+            height=450
+
         )
 
         st.plotly_chart(
+
             fig,
-            use_container_width=True
-        )
 
-        st.dataframe(
-            display_forecast,
             use_container_width=True
-        )
 
-    # ---------------- Category Forecast ---------------- #
+        )
 
     elif forecast_type == "Category":
 
         category = st.selectbox(
-            "Select Category",
+
+            "Category",
+
             sorted(
+
                 sales["Category"].unique()
+
             )
+
         )
 
-        category_forecast = (
+        forecast_df = (
+
             segment_forecasts[
+
                 segment_forecasts["Segment"] == category
+
             ]
+
             .head(horizon)
+
         )
 
         fig = px.line(
-            category_forecast,
+
+            forecast_df,
+
             x="Date",
+
             y="Forecast",
+
             markers=True,
+
             title=f"{category} Forecast"
+
         )
 
         fig.update_layout(
+
             template="plotly_white",
-            title_x=0.5
+
+            title_x=0.5,
+
+            height=450
+
         )
 
         st.plotly_chart(
+
             fig,
-            use_container_width=True
-        )
 
-        st.dataframe(
-            category_forecast,
             use_container_width=True
-        )
 
-    # ---------------- Region Forecast ---------------- #
+        )
 
     else:
 
         region = st.selectbox(
-            "Select Region",
+
+            "Region",
+
             sorted(
+
                 sales["Region"].unique()
+
             )
+
         )
 
-        region_forecast = (
+        forecast_df = (
+
             segment_forecasts[
+
                 segment_forecasts["Segment"] == region
+
             ]
+
             .head(horizon)
+
         )
 
         fig = px.line(
-            region_forecast,
+
+            forecast_df,
+
             x="Date",
+
             y="Forecast",
+
             markers=True,
+
             title=f"{region} Forecast"
+
         )
 
         fig.update_layout(
+
             template="plotly_white",
-            title_x=0.5
+
+            title_x=0.5,
+
+            height=450
+
         )
 
         st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
 
-        st.dataframe(
-            region_forecast,
+            fig,
+
             use_container_width=True
+
         )
 
     st.divider()
 
-    # ---------------- Model Performance ---------------- #
+    c1, c2, c3 = st.columns(3)
 
-    st.subheader("Forecast Model Performance")
+    c1.metric(
+
+        "Month 1",
+
+        f"${forecast_df.iloc[0]['Forecast']:,.0f}"
+
+    )
+
+    c2.metric(
+
+        "Month 2",
+
+        f"${forecast_df.iloc[1]['Forecast']:,.0f}"
+
+    )
+
+    c3.metric(
+
+        "Month 3",
+
+        f"${forecast_df.iloc[2]['Forecast']:,.0f}"
+
+    )
+
+    st.subheader("Forecast Results")
 
     st.dataframe(
+
+        forecast_df,
+
+        use_container_width=True,
+
+        hide_index=True
+
+    )
+
+    st.subheader("Model Performance")
+
+    st.dataframe(
+
         comparison,
-        use_container_width=True
+
+        use_container_width=True,
+
+        hide_index=True
+
     )
 
-    best_model = comparison.iloc[0]
+    best_model = comparison.loc[
 
-    col1, col2, col3 = st.columns(3)
+        comparison["RMSE"].idxmin()
 
-    col1.metric(
-        "MAE",
-        f"{best_model['MAE']:.2f}"
-    )
+    ]
 
-    col2.metric(
-        "RMSE",
-        f"{best_model['RMSE']:.2f}"
-    )
+    st.info(
 
-    col3.metric(
-        "MAPE",
-        f"{best_model['MAPE']:.2f}%"
-    )
+f"""
 
-    st.success(
-        f"""
-        **Recommended Model:** {best_model['Model']}
-        This model achieved the lowest forecasting error and is recommended for 
-        future demand prediction and inventory planning.
-        """
+### Recommended Model
+
+**{best_model['Model']}**
+
+MAE : {best_model['MAE']:.2f}
+
+RMSE : {best_model['RMSE']:.2f}
+
+MAPE : {best_model['MAPE']:.2f}%
+
+This model achieved the lowest forecasting error and is recommended for production deployment.
+
+"""
+
     )
 
     st.download_button(
-        label="📥 Download Forecast",
-        data=display_forecast.to_csv(index=False),
-        file_name="sales_forecast.csv",
+
+        label="Download Forecast",
+
+        data=forecast_df.to_csv(index=False),
+
+        file_name="forecast.csv",
+
         mime="text/csv"
+
     )
-    # ==========================================================
-# Anomaly Report
-# ==========================================================
 
-elif page == "🚨 Anomaly Report":
+# ----------------------------------------------------
+# Anomaly Detection
+# ----------------------------------------------------
 
-    st.title("🚨 Sales Anomaly Detection")
+elif page == "Anomaly Detection":
 
-    st.markdown(
-        """
-        Detect unusual sales spikes and sudden drops using machine learning
-        to identify potential business events and operational risks.
-        """
+    st.title("Anomaly Detection")
+
+    st.caption(
+        "Identify unusual sales spikes and drops using machine learning."
     )
 
     st.divider()
-
-    # ---------------- Overview ---------------- #
 
     total_anomalies = len(anomalies)
 
@@ -626,7 +1067,7 @@ elif page == "🚨 Anomaly Report":
 
     lowest_sale = anomalies["Sales"].min()
 
-    avg_sale = anomalies["Sales"].mean()
+    average_sale = anomalies["Sales"].mean()
 
     c1, c2, c3, c4 = st.columns(4)
 
@@ -647,48 +1088,75 @@ elif page == "🚨 Anomaly Report":
 
     c4.metric(
         "Average Anomaly",
-        f"${avg_sale:,.0f}"
+        f"${average_sale:,.0f}"
     )
 
     st.divider()
 
-    # ---------------- Weekly Sales ---------------- #
-
     weekly_sales = (
+
         sales
+
         .groupby(
+
             pd.Grouper(
+
                 key="Order Date",
+
                 freq="W"
+
             )
+
         )["Sales"]
+
         .sum()
+
         .reset_index()
+
     )
 
     fig = go.Figure()
 
     fig.add_trace(
+
         go.Scatter(
+
             x=weekly_sales["Order Date"],
+
             y=weekly_sales["Sales"],
+
             mode="lines",
-            name="Weekly Sales"
+
+            name="Weekly Sales",
+
+            line=dict(width=3)
+
         )
+
     )
 
     fig.add_trace(
+
         go.Scatter(
+
             x=anomalies["Order Date"],
+
             y=anomalies["Sales"],
+
             mode="markers",
+
             marker=dict(
-                size=11,
-                color="red",
-                symbol="circle"
+
+                color="#DC2626",
+
+                size=10
+
             ),
-            name="Detected Anomalies"
+
+            name="Anomalies"
+
         )
+
     )
 
     fig.update_layout(
@@ -699,123 +1167,191 @@ elif page == "🚨 Anomaly Report":
 
         title_x=0.5,
 
-        xaxis_title="Week",
-
-        yaxis_title="Sales"
+        height=500
 
     )
 
     st.plotly_chart(
+
         fig,
+
         use_container_width=True
+
     )
 
-    st.divider()
-
-    # ---------------- Anomaly Table ---------------- #
-
-    st.subheader("Detected Anomaly Events")
+    st.subheader("Detected Anomalies")
 
     display = anomalies.copy()
 
     display["Order Date"] = display["Order Date"].dt.strftime(
-        "%d-%b-%Y"
+        "%d %b %Y"
     )
 
     st.dataframe(
+
         display,
-        use_container_width=True
+
+        use_container_width=True,
+
+        hide_index=True
+
     )
-
-    st.divider()
-
-    # ---------------- Download ---------------- #
 
     st.download_button(
 
-        "📥 Download Anomaly Report",
+        "Download Anomaly Report",
 
         anomalies.to_csv(index=False),
 
-        file_name="weekly_anomalies.csv",
+        "weekly_anomalies.csv",
 
-        mime="text/csv"
+        "text/csv"
 
     )
-
-    st.divider()
-
-    # ---------------- Business Insights ---------------- #
 
     st.subheader("Business Interpretation")
 
-    st.success(
-        """
-        ### Key Findings
-        • Isolation Forest detected unusual sales behaviour throughout the dataset.
+    st.info("""
 
-        • Most anomalies correspond to sharp demand spikes which may represent
-        seasonal campaigns, festive sales or promotional events.
+### Key Observations
 
-        • A few anomalies indicate unusually weak sales periods that may be linked
-        to inventory shortages or lower customer demand.
+• Significant sales spikes generally align with promotional or seasonal events.
 
-        • Monitoring these events helps businesses improve inventory planning,
-        marketing strategy and demand forecasting.
-        """
-    )
-    # ==========================================================
+• Sudden sales drops may indicate inventory shortages or reduced customer demand.
+
+• Monitoring these anomalies helps improve inventory planning and forecasting.
+
+• Weekly anomaly tracking allows early identification of unexpected business events.
+
+""")
+
+    left, right = st.columns(2)
+
+    with left:
+
+        st.subheader("Sales Distribution")
+
+        fig = px.histogram(
+
+            weekly_sales,
+
+            x="Sales",
+
+            nbins=25,
+
+            title="Distribution of Weekly Sales"
+
+        )
+
+        fig.update_layout(
+
+            template="plotly_white"
+
+        )
+
+        st.plotly_chart(
+
+            fig,
+
+            use_container_width=True
+
+        )
+
+    with right:
+
+        st.subheader("Monthly Anomaly Count")
+
+        anomaly_month = anomalies.copy()
+
+        anomaly_month["Month"] = anomaly_month["Order Date"].dt.month_name()
+
+        monthly_count = (
+
+            anomaly_month
+
+            .groupby("Month")
+
+            .size()
+
+            .reset_index(name="Count")
+
+        )
+
+        fig = px.bar(
+
+            monthly_count,
+
+            x="Month",
+
+            y="Count",
+
+            color="Count",
+
+            title="Detected Anomalies by Month"
+
+        )
+
+        fig.update_layout(
+
+            template="plotly_white"
+
+        )
+
+        st.plotly_chart(
+
+            fig,
+
+            use_container_width=True
+
+        )
+
+# ----------------------------------------------------
 # Demand Segmentation
-# ==========================================================
+# ----------------------------------------------------
 
-elif page == "📦 Demand Segments":
+elif page == "Demand Segmentation":
 
-    st.title("📦 Product Demand Segmentation")
+    st.title("Demand Segmentation")
 
-    st.markdown("""
-    Explore how product sub-categories are grouped based on
-    sales behaviour, demand growth, volatility and order value.
-    """)
+    st.caption(
+        "Understand product demand patterns and identify inventory strategies."
+    )
 
     st.divider()
 
-    # ---------------- KPIs ---------------- #
+    total_subcategories = clusters["Sub-Category"].nunique()
 
-    total_products = clusters["Sub-Category"].nunique()
+    total_segments = clusters["Demand_Segment"].nunique()
 
-    total_clusters = clusters["Demand_Segment"].nunique()
+    total_sales = clusters["Total_Sales"].sum()
 
-    highest_sales = clusters["Total_Sales"].max()
-
-    avg_growth = clusters["Growth_Rate"].mean() * 100
+    avg_order = clusters["Avg_Order_Value"].mean()
 
     c1, c2, c3, c4 = st.columns(4)
 
     c1.metric(
         "Sub Categories",
-        total_products
+        total_subcategories
     )
 
     c2.metric(
         "Demand Segments",
-        total_clusters
+        total_segments
     )
 
     c3.metric(
-        "Highest Sales",
-        f"${highest_sales:,.0f}"
+        "Total Sales",
+        f"${total_sales:,.0f}"
     )
 
     c4.metric(
-        "Average Growth",
-        f"{avg_growth:.1f}%"
+        "Average Order Value",
+        f"${avg_order:.2f}"
     )
 
     st.divider()
 
-    # ---------------- PCA Scatter ---------------- #
-
-    st.subheader("Demand Cluster Visualization")
+    st.subheader("Product Demand Map")
 
     fig = px.scatter(
 
@@ -827,39 +1363,43 @@ elif page == "📦 Demand Segments":
 
         color="Demand_Segment",
 
-        text="Sub-Category",
-
         size="Total_Sales",
 
+        hover_name="Sub-Category",
+
         hover_data=[
+
             "Growth_Rate",
+
             "Avg_Order_Value"
+
         ]
 
-    )
-
-    fig.update_traces(
-        textposition="top center"
     )
 
     fig.update_layout(
 
         template="plotly_white",
 
-        title="K-Means Product Segmentation",
+        title="Demand Segment Distribution",
 
-        title_x=0.5
+        title_x=0.5,
+
+        xaxis_title="Cluster Projection",
+
+        yaxis_title="Cluster Projection",
+
+        height=550
 
     )
 
     st.plotly_chart(
+
         fig,
+
         use_container_width=True
+
     )
-
-    st.divider()
-
-    # ---------------- Cluster Distribution ---------------- #
 
     left, right = st.columns(2)
 
@@ -877,7 +1417,7 @@ elif page == "📦 Demand Segments":
 
         segment_count.columns = [
 
-            "Demand Segment",
+            "Segment",
 
             "Products"
 
@@ -887,13 +1427,13 @@ elif page == "📦 Demand Segments":
 
             segment_count,
 
-            x="Demand Segment",
+            x="Segment",
 
             y="Products",
 
-            color="Demand Segment",
+            color="Segment",
 
-            title="Products in Each Segment"
+            title="Products by Demand Segment"
 
         )
 
@@ -919,7 +1459,7 @@ elif page == "📦 Demand Segments":
 
             segment_count,
 
-            names="Demand Segment",
+            names="Segment",
 
             values="Products",
 
@@ -937,31 +1477,42 @@ elif page == "📦 Demand Segments":
 
         )
 
-    st.divider()
-
-    # ---------------- Product Table ---------------- #
-
     st.subheader("Product Classification")
 
-    st.dataframe(
+    display = clusters.copy()
 
-        clusters.sort_values(
+    display = display.sort_values(
 
-            "Demand_Segment"
-
-        ),
-
-        use_container_width=True
+        "Demand_Segment"
 
     )
 
-    st.divider()
+    st.dataframe(
 
-    # ---------------- Download ---------------- #
+        display,
+
+        use_container_width=True,
+
+        hide_index=True
+
+    )
+
+    st.subheader("Inventory Recommendations")
+
+    st.markdown("""
+
+| Demand Segment | Recommended Strategy |
+|----------------|----------------------|
+| High Volume Stable | Maintain high inventory and prioritize replenishment. |
+| Growing Demand | Increase stock gradually to support future demand. |
+| Seasonal Products | Plan inventory before peak demand periods. |
+| Low Demand | Maintain lean inventory and review pricing strategies. |
+
+""")
 
     st.download_button(
 
-        "📥 Download Product Segments",
+        "Download Segmentation Report",
 
         clusters.to_csv(index=False),
 
@@ -971,430 +1522,274 @@ elif page == "📦 Demand Segments":
 
     )
 
-    st.divider()
-
-    # ---------------- Business Strategy ---------------- #
-
-    st.subheader("Recommended Stocking Strategy")
-
     st.info("""
 
-    ### Core Revenue Drivers
-    Maintain high inventory levels and prioritize replenishment.
+### Executive Summary
 
-    ### Fast Growing Products
-    Increase procurement gradually to support rising demand.
+Demand segmentation helps identify which products require aggressive stocking,
+which products should be monitored closely, and which products may require
+inventory optimization.
 
-    ### Premium High-Value Products
-    Maintain controlled inventory while closely monitoring demand.
+Using clustering allows planners to allocate warehouse space and procurement
+budgets more efficiently.
 
-    ### Low Demand Products
-    Adopt lean inventory practices and review pricing or promotions.
+""")
 
-    """
-    )
-    # ==========================================================
+# ----------------------------------------------------
 # Model Performance
-# ==========================================================
+# ----------------------------------------------------
 
-elif page == "🤖 Model Performance":
+elif page == "Model Performance":
 
-    st.title("🤖 Forecast Model Performance")
-
-    st.markdown("""
-    Compare the forecasting models used in this project and
-    understand why the final production model was selected.
-    """)
-
-    st.divider()
-
-    # ---------------- Best Model ---------------- #
-
-    best_model_row = comparison.loc[
-        comparison["RMSE"].idxmin()
-    ]
-
-    c1, c2, c3, c4 = st.columns(4)
-
-    c1.metric(
-        "🏆 Best Model",
-        best_model_row["Model"]
-    )
-
-    c2.metric(
-        "MAE",
-        f"{best_model_row['MAE']:.2f}"
-    )
-
-    c3.metric(
-        "RMSE",
-        f"{best_model_row['RMSE']:.2f}"
-    )
-
-    c4.metric(
-        "MAPE",
-        f"{best_model_row['MAPE']:.2f}%"
-    )
-
-    st.divider()
-
-    # ---------------- Comparison Table ---------------- #
-
-    st.subheader("Model Comparison")
-
-    st.dataframe(
-        comparison,
-        use_container_width=True
-    )
-
-    st.divider()
-
-    # ---------------- Charts ---------------- #
-
-    left, right = st.columns(2)
-
-    with left:
-
-        fig = px.bar(
-
-            comparison,
-
-            x="Model",
-
-            y="MAE",
-
-            color="Model",
-
-            title="Mean Absolute Error"
-
-        )
-
-        fig.update_layout(
-
-            template="plotly_white",
-
-            showlegend=False
-
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-    with right:
-
-        fig = px.bar(
-
-            comparison,
-
-            x="Model",
-
-            y="RMSE",
-
-            color="Model",
-
-            title="Root Mean Squared Error"
-
-        )
-
-        fig.update_layout(
-
-            template="plotly_white",
-
-            showlegend=False
-
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-    st.divider()
-
-    # ---------------- MAPE ---------------- #
-
-    fig = px.line(
-
-        comparison,
-
-        x="Model",
-
-        y="MAPE",
-
-        markers=True,
-
-        title="Mean Absolute Percentage Error"
-
-    )
-
-    fig.update_layout(
-
-        template="plotly_white",
-
-        title_x=0.5
-
-    )
-
-    st.plotly_chart(
-
-        fig,
-
-        use_container_width=True
-
-    )
-
-    st.divider()
-
-    # ---------------- Recommendation ---------------- #
-
-    st.subheader("Production Recommendation")
-
-    st.success(
-
-        f"""
-        ### Recommended Forecasting Model
-
-        **{best_model_row['Model']}**
-
-        This model achieved the lowest forecasting error and demonstrated
-        the strongest balance between prediction accuracy and generalization.
-
-        It is recommended for:
-
-        • Sales Forecasting
-
-        • Inventory Planning
-
-        • Demand Prediction
-
-        • Supply Chain Decision Support
-
-        • Production Deployment
-
-        """
-    )
-
-    st.divider()
-
-    # ---------------- Download ---------------- #
-
-    st.download_button(
-
-        "📥 Download Model Results",
-
-        comparison.to_csv(index=False),
-
-        file_name="model_performance.csv",
-
-        mime="text/csv"
-
-    )
-    # ==========================================================
-# Model Performance
-# ==========================================================
-
-elif page == "🤖 Model Performance":
-
-    st.title("🤖 Forecast Model Performance")
-
-    st.markdown("""
-    Compare the forecasting models used in this project and
-    understand why the final production model was selected.
-    """)
-
-    st.divider()
-
-    # ---------------- Best Model ---------------- #
-
-    best_model_row = comparison.loc[
-        comparison["RMSE"].idxmin()
-    ]
-
-    c1, c2, c3, c4 = st.columns(4)
-
-    c1.metric(
-        "🏆 Best Model",
-        best_model_row["Model"]
-    )
-
-    c2.metric(
-        "MAE",
-        f"{best_model_row['MAE']:.2f}"
-    )
-
-    c3.metric(
-        "RMSE",
-        f"{best_model_row['RMSE']:.2f}"
-    )
-
-    c4.metric(
-        "MAPE",
-        f"{best_model_row['MAPE']:.2f}%"
-    )
-
-    st.divider()
-
-    # ---------------- Comparison Table ---------------- #
-
-    st.subheader("Model Comparison")
-
-    st.dataframe(
-        comparison,
-        use_container_width=True
-    )
-
-    st.divider()
-
-    # ---------------- Charts ---------------- #
-
-    left, right = st.columns(2)
-
-    with left:
-
-        fig = px.bar(
-
-            comparison,
-
-            x="Model",
-
-            y="MAE",
-
-            color="Model",
-
-            title="Mean Absolute Error"
-
-        )
-
-        fig.update_layout(
-
-            template="plotly_white",
-
-            showlegend=False
-
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-    with right:
-
-        fig = px.bar(
-
-            comparison,
-
-            x="Model",
-
-            y="RMSE",
-
-            color="Model",
-
-            title="Root Mean Squared Error"
-
-        )
-
-        fig.update_layout(
-
-            template="plotly_white",
-
-            showlegend=False
-
-        )
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
-
-    st.divider()
-
-    # ---------------- MAPE ---------------- #
-
-    fig = px.line(
-
-        comparison,
-
-        x="Model",
-
-        y="MAPE",
-
-        markers=True,
-
-        title="Mean Absolute Percentage Error"
-
-    )
-
-    fig.update_layout(
-
-        template="plotly_white",
-
-        title_x=0.5
-
-    )
-
-    st.plotly_chart(
-
-        fig,
-
-        use_container_width=True
-
-    )
-
-    st.divider()
-
-    # ---------------- Recommendation ---------------- #
-
-    st.subheader("Production Recommendation")
-
-    st.success(
-
-        f"""
-        ### Recommended Forecasting Model
-
-        **{best_model_row['Model']}**
-
-        This model achieved the lowest forecasting error and demonstrated
-        the strongest balance between prediction accuracy and generalization.
-
-        It is recommended for:
-
-        • Sales Forecasting
-
-        • Inventory Planning
-
-        • Demand Prediction
-
-        • Supply Chain Decision Support
-
-        • Production Deployment
-
-        """
-    )
-
-    st.divider()
-
-    # ---------------- Download ---------------- #
-
-    st.download_button(
-
-        "📥 Download Model Results",
-
-        comparison.to_csv(index=False),
-
-        file_name="model_performance.csv",
-
-        mime="text/csv"
-
-    )
-    # ==========================================================
-    # Footer
-    # ==========================================================
-
-    st.divider()
+    st.title("Model Performance")
 
     st.caption(
-        "RetailPulse AI • Built using Python, Streamlit, XGBoost, Prophet, SARIMA, Scikit-learn and Plotly"
-    )   
+        "Compare forecasting models and identify the best model for deployment."
+    )
+
+    st.divider()
+
+    best_model = comparison.loc[
+        comparison["RMSE"].idxmin()
+    ]
+
+    c1, c2, c3, c4 = st.columns(4)
+
+    c1.metric(
+        "Selected Model",
+        best_model["Model"]
+    )
+
+    c2.metric(
+        "MAE",
+        f"{best_model['MAE']:.2f}"
+    )
+
+    c3.metric(
+        "RMSE",
+        f"{best_model['RMSE']:.2f}"
+    )
+
+    c4.metric(
+        "MAPE",
+        f"{best_model['MAPE']:.2f}%"
+    )
+
+    st.divider()
+
+    st.subheader("Forecast Accuracy Comparison")
+
+    ranking = comparison.sort_values(
+        "RMSE"
+    )
+
+    st.dataframe(
+
+        ranking,
+
+        use_container_width=True,
+
+        hide_index=True
+
+    )
+
+    left, right = st.columns(2)
+
+    with left:
+
+        fig = px.bar(
+
+            ranking,
+
+            x="Model",
+
+            y="RMSE",
+
+            color="Model",
+
+            title="RMSE Comparison"
+
+        )
+
+        fig.update_layout(
+
+            template="plotly_white",
+
+            showlegend=False
+
+        )
+
+        st.plotly_chart(
+
+            fig,
+
+            use_container_width=True
+
+        )
+
+    with right:
+
+        fig = px.bar(
+
+            ranking,
+
+            x="Model",
+
+            y="MAE",
+
+            color="Model",
+
+            title="MAE Comparison"
+
+        )
+
+        fig.update_layout(
+
+            template="plotly_white",
+
+            showlegend=False
+
+        )
+
+        st.plotly_chart(
+
+            fig,
+
+            use_container_width=True
+
+        )
+
+    fig = px.line(
+
+        ranking,
+
+        x="Model",
+
+        y="MAPE",
+
+        markers=True,
+
+        title="MAPE Comparison"
+
+    )
+
+    fig.update_layout(
+
+        template="plotly_white",
+
+        title_x=0.5,
+
+        height=420
+
+    )
+
+    st.plotly_chart(
+
+        fig,
+
+        use_container_width=True
+
+    )
+
+    st.subheader("Model Ranking")
+
+    leaderboard = ranking.copy()
+
+    leaderboard.insert(
+
+        0,
+
+        "Rank",
+
+        range(
+
+            1,
+
+            len(leaderboard)+1
+
+        )
+
+    )
+
+    st.dataframe(
+
+        leaderboard,
+
+        use_container_width=True,
+
+        hide_index=True
+
+    )
+
+    st.subheader("Deployment Recommendation")
+
+    st.success(
+
+f"""
+
+### Recommended Production Model
+
+**{best_model['Model']}**
+
+This model achieved the lowest prediction error across the evaluation metrics.
+
+It provides the best balance between:
+
+- Forecast Accuracy
+- Model Stability
+- Generalization
+- Business Reliability
+
+This makes it the preferred model for retail demand forecasting
+and inventory planning.
+
+"""
+
+    )
+
+    with st.expander("Model Overview"):
+
+        st.markdown("""
+
+### SARIMA
+
+A statistical forecasting model that captures trend and seasonality.
+Best suited for stable historical time series.
+
+---
+
+### Prophet
+
+A forecasting framework developed for business time series with
+strong seasonal behaviour and holiday effects.
+
+---
+
+### XGBoost
+
+A machine learning model capable of learning complex nonlinear
+relationships using engineered time-series features.
+
+""")
+
+    st.download_button(
+
+        "Download Model Evaluation",
+
+        ranking.to_csv(index=False),
+
+        file_name="model_performance.csv",
+
+        mime="text/csv"
+
+    )
+
+st.divider()
+
+st.caption(
+    "RetailPulse AI • AI-Powered Sales Forecasting & Demand Intelligence • Built with Python, Streamlit, XGBoost, Prophet, SARIMA and Plotly"
+)
+
+
+
+
